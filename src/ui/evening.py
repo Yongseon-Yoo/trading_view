@@ -7,11 +7,18 @@ from src.services.evening_flow import RANKINGS, build_evening
 from src.ui.common import BLUE, RED, chart_style, latest, statuses, title
 
 
-def render(db, market):
+def render(db, market, config):
     title("오늘, 거래가 모인 곳", "외국인과 기관의 매매를 시장별로 정리해 확인하세요.")
+    if config.market_mode != "api":
+        st.warning("키움 API 인증정보가 없습니다. .env 설정을 확인하세요.")
     col, action = st.columns([3, 1])
     col.caption("CLOSING REPORT  /  순매수금액 · 거래대금 TOP 10")
-    if action.button("장 마감 수급 리포트 생성", type="primary", use_container_width=True):
+    if action.button(
+        "장 마감 수급 리포트 생성",
+        type="primary",
+        use_container_width=True,
+        disabled=config.market_mode != "api",
+    ):
         try:
             with st.spinner("시장별 수급과 업종을 조회하고 있어요…"):
                 report = build_evening(market, now_kst())
@@ -56,7 +63,11 @@ def show(report):
                         )
                     )
                 fig.update_layout(barmode="relative")
-                st.plotly_chart(chart_style(fig, 320, "순매수금액 · 억원"), use_container_width=True)
+                st.plotly_chart(
+                    chart_style(fig, 320, "순매수금액 · 억원"),
+                    use_container_width=True,
+                    key=f"evening-sector-{market}-{investor}-{report['generated_at']}",
+                )
                 st.caption("전체 업종 수급이 아닌 순매수·순매도 Top 10 포함 종목 기준 · 매수/매도 각각 집계")
             st.subheader("종목별 원자료")
             rank = st.selectbox(

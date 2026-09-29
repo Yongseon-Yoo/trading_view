@@ -10,6 +10,6 @@
 - 하루에 재생성한 리포트도 별도 ID·생성 시각으로 보관한다. 원본 스냅샷은 수정하지 않는다.
 - 실시간 중복 식별에 누적거래량을 포함한다. 같은 초·가격·수량의 서로 다른 정상 체결을 지우지 않는다.
 - 화면 종료 감지는 UI heartbeat 30초 만료로 처리한다. 중지·페이지 이동은 즉시 정리하며 UI는 1초마다 갱신한다.
-- 샘플은 화면·저장 스냅샷에 명시한다. 실제 API 실패 시 샘플을 몰래 대체하지 않는다. 장후 시연용 실시간 샘플 선택을 별도 제공한다.
+- 2026-09-30부터 런타임 샘플 공급자와 가상 체결을 제거한다. API 실패·무응답은 오류 또는 0건으로만 표시하고, 이전 가상 스냅샷은 삭제하지 않고 일반 목록에서 숨긴다.
 
 공식 근거: [키움 명세](https://github.com/Kiwoom-Securities/Kiwoom-REST-API/blob/main/kiwoom/_data/kiwoom_api_spec.json), [NAVER API HUB 뉴스 검색](https://api.ncloud-docs.com/docs/naver-api-hub-search-news).

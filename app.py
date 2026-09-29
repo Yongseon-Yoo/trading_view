@@ -16,7 +16,6 @@ apply_style()
 def resources():
     config = Settings.load()
     database = Database(config.db_path)
-    database.seed_once(config.news_mode == "sample" and config.market_mode == "sample")
     news, market = providers(config)
     return config, database, news, market
 
@@ -37,8 +36,6 @@ with st.sidebar:
     st.caption("데이터 연결")
     st.markdown(f"**뉴스** · {news.label}")
     st.markdown(f"**시장** · {market.label}")
-    if "샘플" in news.label or "샘플" in market.label:
-        st.info("샘플은 시연용 가상 데이터입니다.")
     st.caption("로컬 저장 · Asia/Seoul\n\n리포트는 생성 당시 내용을 보관합니다.")
 
 if page != "장중 관심종목" and "live_session" in st.session_state:
@@ -47,11 +44,11 @@ if page != "장중 관심종목" and "live_session" in st.session_state:
 
 st.caption(f"MY MARKET WORKSPACE  /  {now_kst():%Y.%m.%d}  /  KRX")
 if page == "아침 브리핑":
-    morning.render(db, news, market)
+    morning.render(db, news, market, config)
 elif page == "장중 관심종목":
     live.render(db, config, market)
 elif page == "장 마감 리포트":
-    evening.render(db, market)
+    evening.render(db, market, config)
 elif page == "리포트 기록":
     history.render(db)
 else:

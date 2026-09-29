@@ -2,7 +2,6 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.providers.kiwoom_realtime import KiwoomRealtimeProvider
-from src.providers.sample_realtime import SampleRealtimeProvider
 from src.services.live import LiveSession
 from src.ui.common import TEAL, chart_style, date_label, title
 
@@ -11,14 +10,17 @@ def render(db, config, market):
     title("지금 움직이는 관심 종목", "연결 이후의 체결 흐름을 확인하세요. 최근 5분 · 종목당 최대 300건.")
     stocks = db.stocks()
     active = "live_session" in st.session_state
-    options = ["샘플 스트림"] if config.market_mode != "api" else ["키움 WebSocket", "샘플 스트림"]
-    selected = st.selectbox("실시간 데이터", options, disabled=active)
-    st.caption("샘플은 가상 체결입니다. 키움은 KRX 체결을 구독하며 거래가 없으면 수신 대기합니다.")
+    if config.market_mode != "api":
+        st.warning("키움 API 인증정보가 없습니다. .env 설정 후 앱을 재시작하세요.")
+    st.caption("키움 KRX 체결을 구독합니다. 장이 닫혔거나 거래가 없으면 수신 대기합니다.")
     a, b, _ = st.columns([1, 1, 3])
-    if a.button("실시간 시작", type="primary", disabled=active or not stocks, use_container_width=True):
-        provider = (
-            SampleRealtimeProvider() if selected == "샘플 스트림" else KiwoomRealtimeProvider(market.client)
-        )
+    if a.button(
+        "실시간 시작",
+        type="primary",
+        disabled=active or not stocks or config.market_mode != "api",
+        use_container_width=True,
+    ):
+        provider = KiwoomRealtimeProvider(market.client)
         session = LiveSession(provider, [s["code"] for s in stocks])
         st.session_state.live_session = session
         session.start()
@@ -32,8 +34,6 @@ def render(db, config, market):
     if "live_session" not in st.session_state:
         st.info("실시간 시작을 누르면 종목 카드와 가격 그래프가 갱신됩니다.")
         return
-    if selected == "샘플 스트림":
-        st.warning("샘플 스트림 · 실제 거래 데이터가 아닙니다.")
     live_panel(stocks)
 
 

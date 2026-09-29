@@ -56,8 +56,6 @@ def chart_style(fig: go.Figure, height: int = 300, x_title: str = "", y_title: s
 
 def statuses(report: dict):
     st.caption(f"저장 기준 · {date_label(report['generated_at'])} KST  |  {report.get('market_source', '')}")
-    if "샘플" in str(report.get("market_source", "")) or "샘플" in str(report.get("news_source", "")):
-        st.warning("샘플 데이터가 포함된 시연용 리포트입니다. 실제 시세·보도가 아닙니다.")
     if report.get("errors"):
         with st.expander(f"수집 상태 · {len(report['errors'])}건 확인 필요"):
             for error in report["errors"]:

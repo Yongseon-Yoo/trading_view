@@ -7,15 +7,19 @@ from src.services.morning_brief import build_morning
 from src.ui.common import TEAL, chart_style, date_label, latest, statuses, title
 
 
-def render(db, news, market):
+def render(db, news, market, config):
     title("하루의 시작, 시장의 단서", "관심 종목과 테마의 밤사이 소식. 의미와 판단은 직접 살펴보세요.")
+    if config.news_mode != "api":
+        st.warning("네이버 뉴스 API 인증정보가 없습니다. .env 설정을 확인하세요.")
+    if config.market_mode != "api":
+        st.info("키움 인증정보가 없어 가격 카드는 표시되지 않습니다.")
     col, action = st.columns([3, 1])
     col.caption("MORNING BRIEF  /  직전 거래일 장 마감 이후")
     if action.button(
         "아침 브리핑 생성",
         type="primary",
         use_container_width=True,
-        disabled=not (db.stocks() or db.themes()),
+        disabled=config.news_mode != "api" or not (db.stocks() or db.themes()),
     ):
         with st.spinner("뉴스와 가격을 모아 리포트를 저장하고 있어요…"):
             report = build_morning(db.stocks(), db.themes(), news, market, now_kst())
@@ -64,10 +68,10 @@ def show(report: dict):
                 format_func=lambda i, items=sections: items[i]["name"],
                 key=f"news-{kind}-{report['generated_at']}",
             )
-            show_section(sections[chosen])
+            show_section(sections[chosen], key=f"morning-chart-{kind}-{report['generated_at']}-{chosen}")
 
 
-def show_section(section: dict):
+def show_section(section: dict, key: str):
     st.subheader(section["name"])
     if section["failed"]:
         st.error("뉴스 수집 실패 · 아래 수집 상태를 확인하세요.")
@@ -91,7 +95,11 @@ def show_section(section: dict):
             hovertemplate="%{x}<br>기사 %{y}건<br>유사 기사 묶음 %{customdata[0]}개<extra></extra>",
         )
     )
-    st.plotly_chart(chart_style(fig, 250, "발행 시각 · KST", "수집 기사 수"), use_container_width=True)
+    st.plotly_chart(
+        chart_style(fig, 250, "발행 시각 · KST", "수집 기사 수"),
+        use_container_width=True,
+        key=key,
+    )
     st.caption("동일 URL은 1건으로 계산 · 양 끝 시간대는 조회 범위 내 기사만 포함 · 유사 제목 묶음은 추정치")
     if not section["groups"] and not section["failed"]:
         st.info("새로운 뉴스 없음")
@@ -102,14 +110,10 @@ def show_section(section: dict):
             st.caption(
                 f"{article['source']}  ·  {date_label(article['published_at'])}  ·  관련 기사 {len(group)}건"
             )
-            if article["source"] == "가상 뉴스":
-                st.caption("시연용 가상 기사 · 원문 없음")
-            else:
-                st.link_button("원문 보기 ↗", article["url"])
+            st.link_button("원문 보기 ↗", article["url"])
             if len(group) > 1:
                 with st.expander("묶인 기사 보기"):
                     for item in group[1:]:
                         st.write(item["title"])
                         st.caption(f"{item['source']} · {date_label(item['published_at'])}")
-                        if item["source"] != "가상 뉴스":
-                            st.link_button("기사 열기 ↗", item["url"])
+                        st.link_button("기사 열기 ↗", item["url"])

@@ -1,13 +1,13 @@
 # 주식대시보드YS Architecture
 
-> 상태: IMPLEMENTED - 샘플·자동 테스트 및 공급자 단독 조회 검증 완료
+> 상태: IMPLEMENTED - 실제 API 전용 런타임, 테스트 대체 공급자 검증
 
 승인된 기술 구성: Python + Streamlit + SQLite + Plotly
 
 ## 1. 목표
 
 - 외부 API 변경이 UI와 핵심 로직에 직접 전파되지 않게 한다.
-- 실제 API 키 없이도 샘플 데이터로 전체 흐름을 검증한다.
+- 실제 API 키 없이도 테스트 대체 구현으로 서비스 로직을 검증하되 앱에서 가상 데이터를 제공하지 않는다.
 - 뉴스와 수급 컴포넌트를 독립적으로 개발·테스트한다.
 - 하루짜리 MVP에 맞게 단일 프로세스와 SQLite를 유지한다.
 
@@ -22,7 +22,7 @@ Domain Models / Rules
     ↓
 Provider Interfaces + Repositories
     ↓
-Market Data API | NAVER API HUB Search | SQLite | Sample Providers
+Market Data API | NAVER API HUB Search | SQLite
 ```
 
 Streamlit은 로컬 웹 UI, SQLite는 영구 로컬 저장소, Plotly는 모든 대화형 차트에 사용한다.
@@ -49,9 +49,7 @@ src/
 │   ├── http.py
 │   ├── kiwoom.py
 │   ├── kiwoom_realtime.py
-│   ├── naver_news.py
-│   ├── sample.py
-│   └── sample_realtime.py
+│   └── naver_news.py
 ├── services/
 │   ├── morning_brief.py
 │   ├── evening_flow.py
@@ -127,7 +125,7 @@ User request
 Watchlist DB
  → Live Watchlist UI
  → RealtimeMarketProvider
- → Kiwoom 0B WebSocket 또는 SampleRealtimeProvider
+ → Kiwoom 0B WebSocket
  → normalize / rolling 5-minute buffer
  → Streamlit cards and line chart
 ```
@@ -152,15 +150,15 @@ Watchlist DB
 - 도메인·서비스: 외부 통신 없는 단위 테스트
 - 공급자: 저장된 응답 fixture를 이용한 파싱 테스트
 - 저장소: 임시 SQLite 통합 테스트
-- 전체 흐름: 샘플 공급자를 이용한 스모크 테스트
+- 전체 흐름: 테스트 대체 공급자를 이용한 스모크 테스트
 - 실제 API: 별도 수동 검증, 자동 테스트 기본 제외
-- 실시간 공급자: 저장된 이벤트 fixture와 SampleRealtimeProvider로 스트림 테스트
+- 실시간 공급자: 저장된 이벤트 fixture와 테스트 대체 스트림으로 검증
 
 ## 9. 보안
 
 - `.env`는 커밋하지 않는다.
 - `.env.example`에는 빈 값만 둔다.
-- 공급자별 필수 키가 모두 비어 있으면 해당 SampleProvider를 사용한다.
+- 공급자별 필수 키가 모두 비어 있으면 해당 기능을 비활성화하고 설정 안내를 표시한다.
 - 일부 키만 존재하면 외부 호출을 막고 설정 오류를 표시한다.
 - 키움의 기본 연결 환경은 모의투자로 한다.
 - API 응답 또는 예외에 인증정보가 포함되지 않게 한다.

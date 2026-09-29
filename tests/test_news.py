@@ -4,10 +4,10 @@ import httpx
 
 from src.domain.models import KST, Article, ProviderError
 from src.providers.naver_news import NaverNewsProvider
-from src.providers.sample import SampleNewsProvider
 from src.services.market_calendar import last_close, market_state
 from src.services.morning_brief import build_morning
 from src.services.news_dedup import organize
+from tests.fakes import FakeNewsProvider
 
 
 def test_monday_and_holiday_window():
@@ -64,9 +64,11 @@ def test_quote_failure_preserves_news():
     result = build_morning(
         [{"code": "005930", "name": "삼성전자"}],
         [],
-        SampleNewsProvider(),
+        FakeNewsProvider(
+            [Article("뉴스", "example.com", datetime(2026, 9, 29, 7, tzinfo=KST), "https://example.com/1")]
+        ),
         BrokenMarket(),
         datetime(2026, 9, 29, 8, tzinfo=KST),
     )
-    assert result["sections"][0]["total"] == 12
+    assert result["sections"][0]["total"] == 1
     assert result["errors"] and not result["quotes"]

@@ -56,7 +56,7 @@ def render(db, config):
                     st.rerun()
     with config_tab:
         modes = {
-            "sample": "샘플 데이터",
+            "missing": "인증정보 없음",
             "api": "API 키 설정됨 · 연결은 조회 시 확인",
             "invalid": "설정 불완전",
         }
@@ -70,4 +70,6 @@ def render(db, config):
             "NAVER_CLIENT_ID=\nNAVER_CLIENT_SECRET=\nKIWOOM_APP_KEY=\nKIWOOM_APP_SECRET=\nKIWOOM_ENV=mock",
             language="ini",
         )
-        st.caption("키가 모두 비어 있으면 샘플 모드입니다. 일부만 입력하면 실제 호출을 차단합니다.")
+        st.caption(
+            "키가 없거나 일부만 입력되면 실제 조회를 시작하지 않습니다. 가상 데이터로 대체하지 않습니다."
+        )

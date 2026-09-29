@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 def credential_mode(first: str, second: str) -> str:
     if first and second:
         return "api"
-    return "invalid" if first or second else "sample"
+    return "invalid" if first or second else "missing"
 
 
 @dataclass(frozen=True)

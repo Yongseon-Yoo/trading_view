@@ -7,13 +7,6 @@ from uuid import uuid4
 
 from src.domain.models import serializable
 
-DEFAULT_STOCKS = [("005930", "삼성전자"), ("000660", "SK하이닉스"), ("012450", "한화에어로스페이스")]
-DEFAULT_THEMES = {
-    "반도체·HBM": ["반도체", "HBM", "메모리 반도체"],
-    "방산": ["방산", "방산 수출", "국방 계약"],
-    "AI 인프라": ["AI 데이터센터", "AI 반도체", "GPU"],
-}
-
 
 class Database:
     def __init__(self, path: str):
@@ -21,7 +14,6 @@ class Database:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as con:
             con.executescript("""
-                CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS stocks(code TEXT PRIMARY KEY, name TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS themes(name TEXT PRIMARY KEY, keywords TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS links(
@@ -43,27 +35,6 @@ class Database:
                 yield con
         finally:
             con.close()
-
-    def seed_once(self, sample: bool):
-        with self.connect() as con:
-            if con.execute("SELECT 1 FROM meta WHERE key='initialized'").fetchone():
-                return
-            empty = not con.execute("SELECT 1 FROM stocks UNION SELECT 1 FROM themes").fetchone()
-            if sample and empty:
-                con.executemany("INSERT INTO stocks VALUES(?,?)", DEFAULT_STOCKS)
-                con.executemany(
-                    "INSERT INTO themes VALUES(?,?)",
-                    [(name, json.dumps(keys, ensure_ascii=False)) for name, keys in DEFAULT_THEMES.items()],
-                )
-                con.executemany(
-                    "INSERT INTO links VALUES(?,?)",
-                    [
-                        (code, theme)
-                        for code, _ in DEFAULT_STOCKS
-                        for theme in (["방산"] if code == "012450" else ["반도체·HBM", "AI 인프라"])
-                    ],
-                )
-            con.execute("INSERT INTO meta VALUES('initialized','1')")
 
     def stocks(self) -> list[dict]:
         with self.connect() as con:
@@ -132,9 +103,13 @@ class Database:
     def reports(self) -> list[dict]:
         with self.connect() as con:
             return [
-                dict(r)
+                {key: r[key] for key in ("id", "kind", "report_date", "generated_at")}
                 for r in con.execute(
-                    "SELECT id,kind,report_date,generated_at FROM reports ORDER BY generated_at DESC"
+                    "SELECT id,kind,report_date,generated_at,content FROM reports ORDER BY generated_at DESC"
+                )
+                if not any(
+                    "샘플" in str(json.loads(r["content"]).get(source, ""))
+                    for source in ("news_source", "market_source")
                 )
             ]
 

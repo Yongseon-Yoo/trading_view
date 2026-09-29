@@ -5,8 +5,8 @@ import pytest
 
 from src.domain.models import KST, ProviderError
 from src.providers.kiwoom import KiwoomClient, KiwoomMarketProvider, number
-from src.providers.sample import SampleMarketProvider
 from src.services.evening_flow import build_evening, group_sectors
+from tests.fakes import FakeMarketProvider
 
 
 def test_units_and_direction():
@@ -48,7 +48,7 @@ def test_kiwoom_request_and_parsing(monkeypatch):
 
 
 def test_all_markets_and_sector_buy_sell_separated():
-    provider = SampleMarketProvider()
+    provider = FakeMarketProvider()
     result = build_evening(provider, datetime(2026, 9, 29, 19, tzinfo=KST))
     for market in ("KOSPI", "KOSDAQ"):
         assert len(result["tables"][market]) == 5
@@ -61,7 +61,7 @@ def test_all_markets_and_sector_buy_sell_separated():
 
 
 def test_partial_rank_failure():
-    class Partial(SampleMarketProvider):
+    class Partial(FakeMarketProvider):
         def ranks(self, market, investor, side):
             if investor == "institution":
                 raise ProviderError("실패")

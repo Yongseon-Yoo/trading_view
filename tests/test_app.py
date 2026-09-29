@@ -1,20 +1,34 @@
+from datetime import datetime
 from pathlib import Path
 
+import streamlit as st
 from streamlit.testing.v1 import AppTest
+
+from src.domain.models import KST
+from src.repositories.database import Database
+from src.services.evening_flow import build_evening
+from src.services.morning_brief import build_morning
+from tests.fakes import FakeMarketProvider, FakeNewsProvider
 
 
 def test_dashboard_journey(tmp_path, monkeypatch):
-    monkeypatch.setenv("YS_DB_PATH", str(tmp_path / "ui.db"))
+    st.cache_resource.clear()
+    path = str(tmp_path / "ui.db")
+    monkeypatch.setenv("YS_DB_PATH", path)
     for key in ("NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "KIWOOM_APP_KEY", "KIWOOM_APP_SECRET"):
-        monkeypatch.setenv(key, "")
+        monkeypatch.setenv(key, "test-credential")
+    db = Database(path)
+    db.save_stock("005930", "삼성전자")
+    db.save_theme("반도체", ["반도체"], ["005930"])
+    # Both sections have identical zero-count charts, reproducing the former duplicate-ID crash.
+    at = datetime(2026, 9, 29, 8, tzinfo=KST)
+    db.save_report(build_morning(db.stocks(), db.themes(), FakeNewsProvider(), FakeMarketProvider(), at))
+    db.save_report(build_evening(FakeMarketProvider(), datetime(2026, 9, 29, 19, tzinfo=KST)))
     app = AppTest.from_file(Path(__file__).resolve().parents[1] / "app.py", default_timeout=30).run()
     assert not app.exception
     assert app.title[0].value == "하루의 시작, 시장의 단서"
-    app.button[0].click().run()
-    assert not app.exception
     assert len(app.metric) >= 3
     app.sidebar.radio[0].set_value("장 마감 리포트").run()
-    app.button[0].click().run()
     assert not app.exception
     assert len(app.dataframe) == 2
     app.sidebar.radio[0].set_value("리포트 기록").run()
@@ -24,3 +38,21 @@ def test_dashboard_journey(tmp_path, monkeypatch):
     assert not app.exception
     app.sidebar.radio[0].set_value("장중 관심종목").run()
     assert not app.exception
+
+
+def test_missing_credentials_show_empty_state(tmp_path, monkeypatch):
+    st.cache_resource.clear()
+    path = str(tmp_path / "empty.db")
+    monkeypatch.setenv("YS_DB_PATH", path)
+    for key in ("NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "KIWOOM_APP_KEY", "KIWOOM_APP_SECRET"):
+        monkeypatch.setenv(key, "")
+    db = Database(path)
+    assert db.stocks() == db.themes() == []
+    db.save_stock("005930", "삼성전자")
+    app = AppTest.from_file(Path(__file__).resolve().parents[1] / "app.py", default_timeout=30).run()
+    assert not app.exception
+    assert db.reports() == []
+    assert app.button[0].disabled
+    app.sidebar.radio[0].set_value("장중 관심종목").run()
+    assert not app.exception
+    assert app.button[0].disabled

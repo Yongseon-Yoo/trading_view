@@ -4,8 +4,8 @@ from datetime import timedelta
 
 from src.domain.models import TradeTick, now_kst
 from src.providers.kiwoom_realtime import parse_ticks, registration
-from src.providers.sample_realtime import SampleRealtimeProvider
 from src.services.live import LiveSession
+from tests.fakes import FakeRealtimeProvider
 
 
 def test_subscription_and_signed_fields():
@@ -39,7 +39,7 @@ def test_bounded_buffer_and_legitimate_same_second_ticks():
 
 
 def test_stream_start_stop_cleanup():
-    live = LiveSession(SampleRealtimeProvider(0.01), ["005930", "000660"])
+    live = LiveSession(FakeRealtimeProvider(0.01), ["005930", "000660"])
     live.start()
     deadline = time.monotonic() + 2
     while live.snapshot()[0] != "연결됨" and time.monotonic() < deadline:
@@ -52,7 +52,7 @@ def test_stream_start_stop_cleanup():
 
 
 def test_heartbeat_ends_idle_session():
-    live = LiveSession(SampleRealtimeProvider(0.01), ["005930"])
+    live = LiveSession(FakeRealtimeProvider(0.01), ["005930"])
     live._heartbeat = time.monotonic() - 31
     live.start()
     live._thread.join(timeout=2)
