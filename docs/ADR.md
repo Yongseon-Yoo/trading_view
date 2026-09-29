@@ -61,11 +61,12 @@
 
 - 상태: 사용자 승인
 - 맥락: 관심 종목과 관심 테마의 장 마감 이후 기사 제목·출처·시각·링크가 필요하다.
-- 결정: MVP의 NewsProvider 구현체로 네이버 뉴스 검색 API를 선택한다.
+- 결정: MVP의 NewsProvider 구현체로 NAVER API HUB 뉴스 검색 API를 선택한다. 기존 Developers Center API와 다른 호출 주소(`/search/v1/news`)와 인증 헤더(`X-NCP-APIGW-API-KEY-ID`, `X-NCP-APIGW-API-KEY`)를 사용한다.
 - 이유: 공식 REST API로 필요한 뉴스 메타데이터를 제공하며 기사 본문 크롤링이 필요하지 않다.
 - 포기한 것: 전체 언론시장 완전 수집, 기사 본문 분석, 복수 뉴스 공급자 교차검증.
 - 제한: 결과는 네이버 뉴스 검색 범위와 정렬 정책의 영향을 받는다.
 - 재검토 조건: 검색 누락이 핵심 사용자 경험을 해치거나 다른 공식 공급자가 필요할 때.
+- 이관 근거: [NAVER API HUB 이관 가이드](https://guide.ncloud-docs.com/docs/apihub-migration). 두 플랫폼의 키는 서로 호환되지 않는다.
 
 ## ADR-008: 키움 WebSocket은 장중 관심종목 체결에 한정
 

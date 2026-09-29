@@ -6,10 +6,10 @@
 - `ka10065` 금액 선택과 `ka10032` 거래대금의 단위는 백만원이다. 원본 문자열·단위와 원 단위 정규화 값을 보존한다.
 - 업종 차트는 매수 Top 10과 매도 Top 10을 별도로 합산해 서로 상쇄하지 않는다.
 - 장전 가격은 종목 마스터의 전일 종가를 이용한다. 전일 등락률을 검증할 수 없으면 빈 값으로 표시한다. 조회 시각과 가격 기준일을 구분한다.
-- 네이버는 언론사 이름을 별도 제공하지 않으므로 원문 도메인을 출처로 표시한다. 조회 페이지 상한 도달과 파싱 누락은 수집 상태에 남긴다.
+- NAVER API HUB 뉴스 검색을 사용한다. 기존 Developers Center와 URL·인증 헤더·키가 다르다. 언론사 이름을 별도 제공하지 않으므로 원문 도메인을 출처로 표시한다. 조회 페이지 상한 도달과 파싱 누락은 수집 상태에 남긴다.
 - 하루에 재생성한 리포트도 별도 ID·생성 시각으로 보관한다. 원본 스냅샷은 수정하지 않는다.
 - 실시간 중복 식별에 누적거래량을 포함한다. 같은 초·가격·수량의 서로 다른 정상 체결을 지우지 않는다.
 - 화면 종료 감지는 UI heartbeat 30초 만료로 처리한다. 중지·페이지 이동은 즉시 정리하며 UI는 1초마다 갱신한다.
 - 샘플은 화면·저장 스냅샷에 명시한다. 실제 API 실패 시 샘플을 몰래 대체하지 않는다. 장후 시연용 실시간 샘플 선택을 별도 제공한다.
 
-공식 근거: [키움 명세](https://github.com/Kiwoom-Securities/Kiwoom-REST-API/blob/main/kiwoom/_data/kiwoom_api_spec.json), [네이버 뉴스 검색](https://developers.naver.com/docs/serviceapi/search/news/news.md).
+공식 근거: [키움 명세](https://github.com/Kiwoom-Securities/Kiwoom-REST-API/blob/main/kiwoom/_data/kiwoom_api_spec.json), [NAVER API HUB 뉴스 검색](https://api.ncloud-docs.com/docs/naver-api-hub-search-news).

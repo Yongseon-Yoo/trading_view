@@ -1,6 +1,6 @@
 # 주식대시보드YS Architecture
 
-> 상태: IMPLEMENTED - 샘플·자동 테스트 검증, 실제 키 통합 검증 대기
+> 상태: IMPLEMENTED - 샘플·자동 테스트 및 공급자 단독 조회 검증 완료
 
 승인된 기술 구성: Python + Streamlit + SQLite + Plotly
 
@@ -22,7 +22,7 @@ Domain Models / Rules
     ↓
 Provider Interfaces + Repositories
     ↓
-Market Data API | Naver Search | SQLite | Sample Providers
+Market Data API | NAVER API HUB Search | SQLite | Sample Providers
 ```
 
 Streamlit은 로컬 웹 UI, SQLite는 영구 로컬 저장소, Plotly는 모든 대화형 차트에 사용한다.

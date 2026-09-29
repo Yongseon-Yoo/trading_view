@@ -58,7 +58,7 @@ KIWOOM_ENV=mock
 YS_DB_PATH=data/dashboard.db
 ```
 
-- 네이버: 개발자센터에서 검색 API 사용 권한이 있는 애플리케이션을 생성합니다.
+- 네이버: NAVER API HUB에서 뉴스 검색 API를 선택한 Application을 등록하고, 발급된 Client ID/Secret을 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`에 입력합니다. 기존 NAVER Developers Center 키와는 호환되지 않습니다.
 - 키움: `mock`에는 모의 환경에서 발급한 키를 입력합니다. 운영 시세 조회는 운영 키와 `KIWOOM_ENV=real`을 함께 설정합니다. 주문 기능은 없습니다.
 - 각 공급자의 키 두 개가 모두 비어 있으면 해당 공급자만 샘플 모드입니다. 두 개 모두 있으면 API 모드, 일부만 있으면 설정 오류입니다.
 - 실제 API 오류를 샘플 성공으로 대체하지 않습니다. 부분 실패는 화면과 저장 리포트에 남습니다.
@@ -97,7 +97,7 @@ ruff check .
 ruff format --check .
 ```
 
-자동 테스트는 네트워크와 실제 키 없이 실행합니다. HTTP 응답 파싱·페이지 처리·금액 단위·휴장일·뉴스 중복·리포트 보존·실시간 버퍼/정리·Streamlit 화면 흐름을 검증합니다. **키 발급 전이므로 실제 네이버·키움 서버와의 인증 및 실시간 통합 검증은 아직 수행하지 않았습니다.** 키 입력 후 각 화면에서 실제 조회를 확인해야 합니다.
+자동 테스트는 네트워크와 실제 키 없이 실행합니다. HTTP 응답 파싱·페이지 처리·금액 단위·휴장일·뉴스 중복·리포트 보존·실시간 버퍼/정리·Streamlit 화면 흐름을 검증합니다. 2026-09-30 실제 키로 NAVER API HUB 뉴스 단독 조회와 키움 모의 REST 시세·순위 조회 및 WebSocket 구독 응답을 확인했습니다. 전체 UI 생성 흐름과 실시간 체결 수신은 별도 검증 대상입니다. 실제 API 호출 결과는 키와 권한·시장 시간에 따라 달라질 수 있습니다.
 
 ## SDD 기록
 
@@ -108,4 +108,4 @@ ruff format --check .
 
 명세 협의 → 승인 → 단계별 구현·테스트 → 화면 검증을 기록했습니다. NH선물 API 자체를 연동한 프로젝트는 아니며, API 인증·금융 데이터 정규화·WebSocket·실패 처리 역량을 보여주는 포트폴리오입니다.
 
-공식 자료: [키움 API 명세](https://github.com/Kiwoom-Securities/Kiwoom-REST-API), [네이버 뉴스 검색](https://developers.naver.com/docs/serviceapi/search/news/news.md).
+공식 자료: [키움 API 명세](https://github.com/Kiwoom-Securities/Kiwoom-REST-API), [NAVER API HUB 뉴스 검색](https://api.ncloud-docs.com/docs/naver-api-hub-search-news), [NAVER API HUB 이관 가이드](https://guide.ncloud-docs.com/docs/apihub-migration).

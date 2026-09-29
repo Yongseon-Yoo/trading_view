@@ -56,6 +56,38 @@ def test_naver_partial_page_failure_is_explicit(monkeypatch):
     assert len(result.articles) == 100 and result.warnings
 
 
+def test_naver_api_hub_request_contract():
+    def handler(request):
+        assert str(request.url).startswith("https://naverapihub.apigw.ntruss.com/search/v1/news?")
+        assert request.headers["X-NCP-APIGW-API-KEY-ID"] == "test-id"
+        assert request.headers["X-NCP-APIGW-API-KEY"] == "test-secret"
+        assert "X-Naver-Client-Id" not in request.headers
+        assert request.url.params["query"] == "반도체"
+        return httpx.Response(
+            200,
+            json={
+                "items": [
+                    {
+                        "title": "<b>반도체</b> 뉴스",
+                        "originallink": "https://example.com/news",
+                        "link": "https://news.naver.com/news",
+                        "pubDate": "Tue, 29 Sep 2026 08:00:00 +0900",
+                    }
+                ]
+            },
+        )
+
+    provider = NaverNewsProvider(
+        "test-id", "test-secret", httpx.Client(transport=httpx.MockTransport(handler))
+    )
+    result = provider.search(
+        "반도체", datetime(2026, 9, 28, tzinfo=KST), datetime(2026, 9, 29, 9, tzinfo=KST)
+    )
+    assert len(result.articles) == 1
+    assert result.articles[0].title == "반도체 뉴스"
+    assert result.articles[0].url == "https://example.com/news"
+
+
 def test_websocket_login_ping_register_and_unsubscribe(monkeypatch):
     class Client:
         ws_url = "wss://fixture.example"

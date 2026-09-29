@@ -63,7 +63,9 @@ def render(db, config):
         st.write("뉴스: " + modes[config.news_mode])
         st.write("시장: " + modes[config.market_mode])
         st.write("키움 환경: " + config.kiwoom_env)
-        st.info("프로젝트의 .env.example을 .env로 복사해 발급받은 키를 채우고 앱을 재시작하세요.")
+        st.info(
+            "프로젝트의 .env.example을 .env로 복사해 발급받은 키를 채우고 앱을 재시작하세요. 네이버는 NAVER API HUB 뉴스 검색 Application의 키를 사용합니다."
+        )
         st.code(
             "NAVER_CLIENT_ID=\nNAVER_CLIENT_SECRET=\nKIWOOM_APP_KEY=\nKIWOOM_APP_SECRET=\nKIWOOM_ENV=mock",
             language="ini",

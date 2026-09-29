@@ -13,9 +13,9 @@
 | 4 | WebSocket 공급자, 샘플 스트림, UI | LOGIN/PING/REG/REMOVE, 버퍼, 제한 재연결, heartbeat |
 | 5 | 5개 화면, 기록·설정, README, CI | Streamlit AppTest, 브라우저 생성·차트·실시간 시작/중지 |
 
-자동 테스트 21개 통과. Ruff 검사 및 포맷 검사 통과. 외부 의존성 `exchange-calendars`에서 NumPy 시간 단위 deprecation 경고가 발생하지만 달력 테스트는 통과한다.
+2026-09-30 NAVER API HUB 이관 후 자동 테스트 22개 통과. Ruff 검사 및 포맷 검사 통과. 외부 의존성 `exchange-calendars`에서 NumPy 시간 단위 deprecation 경고가 발생하지만 달력 테스트는 통과한다.
 
-실제 API 키는 빈 상태이며 네이버·키움 실서버 인증과 모의 WebSocket 수신은 미검증이다. 로컬 실행 서버와 샘플 모드로 재현 가능하다. 비밀정보와 SQLite 파일은 Git 추적에서 제외한다.
+실제 키로 NAVER API HUB 뉴스 검색 단독 조회, 키움 모의 REST 시세·순위 조회, 키움 모의 WebSocket 구독 ACK를 확인했다. 뉴스 조회는 키워드·시간 범위에 따라 1,000건 검색 상한 경고가 발생할 수 있다. 전체 UI 생성 흐름과 WebSocket 실제 체결 수신은 별도 검증 대상이다. 로컬 실행 서버와 샘플 모드로 재현 가능하다. 비밀정보와 SQLite 파일은 Git 추적에서 제외한다.
 
 ## 운영 방식
 

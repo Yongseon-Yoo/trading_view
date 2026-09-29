@@ -21,10 +21,11 @@ def safe_url(url: str) -> bool:
 
 class NaverNewsProvider:
     label = "네이버 뉴스 검색 결과 기준"
+    url = "https://naverapihub.apigw.ntruss.com/search/v1/news"
 
     def __init__(self, client_id: str, secret: str, client: httpx.Client | None = None):
         self.client = client or httpx.Client(timeout=12)
-        self.headers = {"X-Naver-Client-Id": client_id, "X-Naver-Client-Secret": secret}
+        self.headers = {"X-NCP-APIGW-API-KEY-ID": client_id, "X-NCP-APIGW-API-KEY": secret}
 
     def search(self, query: str, start: datetime, end: datetime) -> SearchResult:
         articles, warnings = [], []
@@ -33,7 +34,7 @@ class NaverNewsProvider:
                 data, _ = request_json(
                     self.client,
                     "GET",
-                    "https://openapi.naver.com/v1/search/news.json",
+                    self.url,
                     headers=self.headers,
                     params={"query": query, "display": 100, "start": offset, "sort": "date"},
                 )
