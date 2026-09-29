@@ -4,7 +4,7 @@ from src.ui.common import title
 
 
 def render(db, config):
-    title("나의 관심 목록", "궁금한 종목과 뉴스 키워드를 직접 관리하세요.")
+    title("관심 종목·설정", "종목과 뉴스 키워드를 직접 관리합니다.")
     stock_tab, theme_tab, config_tab = st.tabs(["관심 종목", "관심 테마", "연결 설정"])
     with stock_tab:
         with st.form("stock_form", clear_on_submit=True):

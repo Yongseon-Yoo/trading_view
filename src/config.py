@@ -39,5 +39,5 @@ class Settings:
                 for k in ("NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "KIWOOM_APP_KEY", "KIWOOM_APP_SECRET")
             ),
             kiwoom_env=os.getenv("KIWOOM_ENV", "mock").strip(),
-            db_path=os.getenv("YS_DB_PATH", "data/dashboard.db"),
+            db_path=os.getenv("DASHBOARD_DB_PATH") or os.getenv("YS_DB_PATH", "data/dashboard.db"),
         )

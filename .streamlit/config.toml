@@ -1,10 +1,15 @@
 [theme]
-base = "light"
-primaryColor = "#137E73"
-backgroundColor = "#F6F8FA"
-secondaryBackgroundColor = "#FFFFFF"
-textColor = "#172B3A"
+base = "dark"
+primaryColor = "#24C4E5"
+backgroundColor = "#0D141C"
+secondaryBackgroundColor = "#15232E"
+textColor = "#ECF5F8"
 font = "sans serif"
+
+[theme.sidebar]
+backgroundColor = "#091119"
+secondaryBackgroundColor = "#15232E"
+textColor = "#ECF5F8"
 
 [server]
 address = "127.0.0.1"

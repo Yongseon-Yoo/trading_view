@@ -1,6 +1,12 @@
-# 주식대시보드
+# 대시보드
 
 관심 종목의 뉴스, 시장 전체의 외국인·기관 수급, 장중 체결을 한곳에 모아보는 로컬 대시보드입니다. 뉴스의 의미와 날짜별 비교는 사용자가 직접 판단합니다.
+
+![아침 브리핑의 관심 종목 가격과 뉴스 동향](docs/images/dashboard-overview.png)
+
+![시간대별 뉴스 차트와 기사 목록](docs/images/dashboard-news.png)
+
+위 화면은 실제 API로 생성한 로컬 리포트의 예입니다. 수치와 기사 목록은 실행 시점과 사용자 설정에 따라 달라집니다.
 
 ## 실행
 
@@ -45,7 +51,7 @@ NAVER_CLIENT_SECRET=
 KIWOOM_APP_KEY=
 KIWOOM_APP_SECRET=
 KIWOOM_ENV=mock
-YS_DB_PATH=data/dashboard.db
+DASHBOARD_DB_PATH=data/dashboard.db
 ```
 
 - 네이버: NAVER API HUB에서 뉴스 검색 API를 선택한 Application을 등록하고, 발급된 Client ID/Secret을 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`에 입력합니다. 기존 NAVER Developers Center 키와는 호환되지 않습니다.
@@ -91,7 +97,7 @@ ruff format --check .
 
 ## SDD 기록
 
-- [PRD](docs/PRD.md) · [요구사항](REQUIREMENTS.md)
+- [PRD](docs/PRD.md) · [요구사항](REQUIREMENTS.md) · [디자인 시스템](docs/DESIGN_SYSTEM.md)
 - [아키텍처](docs/ARCHITECTURE.md) · [설계 결정](docs/ADR.md)
 - [구현 계획 및 결과](docs/IMPLEMENTATION_PLAN.md) · [구현 기준 보완](docs/IMPLEMENTATION_NOTES.md)
 - [아침](docs/specs/MORNING_NEWS_BRIEF.md) · [수급](docs/specs/EVENING_FLOW_REPORT.md) · [실시간](docs/specs/LIVE_WATCHLIST.md)

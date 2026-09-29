@@ -6,7 +6,7 @@ from src.ui.morning import show as show_morning
 
 
 def render(db):
-    title("기록에서 다시 읽는 시장", "생성 당시의 데이터와 수집 상태를 그대로 보관합니다.")
+    title("리포트 기록", "생성 당시의 데이터와 수집 상태를 그대로 보관합니다.")
     reports = db.reports()
     if not reports:
         st.info("아직 저장된 리포트가 없습니다. 아침 또는 장 마감 리포트를 생성해보세요.")

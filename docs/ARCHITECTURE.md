@@ -1,4 +1,4 @@
-# 주식대시보드YS Architecture
+# 대시보드 Architecture
 
 > 상태: IMPLEMENTED - 실제 API 전용 런타임, 테스트 대체 공급자 검증
 

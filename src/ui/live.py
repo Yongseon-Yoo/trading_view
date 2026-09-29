@@ -3,11 +3,11 @@ import streamlit as st
 
 from src.providers.kiwoom_realtime import KiwoomRealtimeProvider
 from src.services.live import LiveSession
-from src.ui.common import TEAL, chart_style, date_label, title
+from src.ui.common import ACCENT, chart_style, date_label, title
 
 
 def render(db, config, market):
-    title("지금 움직이는 관심 종목", "연결 이후의 체결 흐름을 확인하세요. 최근 5분 · 종목당 최대 300건.")
+    title("실시간 관심종목", "연결 이후의 체결 흐름 · 최근 5분 · 종목당 최대 300건")
     stocks = db.stocks()
     active = "live_session" in st.session_state
     if config.market_mode != "api":
@@ -65,10 +65,10 @@ def live_panel(stocks):
                         x=[r.executed_at for r in rows],
                         y=[r.price for r in rows],
                         mode="lines+markers",
-                        line=dict(color=TEAL, width=2),
+                        line=dict(color=ACCENT, width=2),
                         marker=dict(size=3),
                         fill="tozeroy",
-                        fillcolor="rgba(19,126,115,.06)",
+                        fillcolor="rgba(36,196,229,.10)",
                     )
                 )
                 fig.update_yaxes(

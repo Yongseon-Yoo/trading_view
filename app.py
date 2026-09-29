@@ -8,7 +8,7 @@ from src.ui import evening, history, live, morning
 from src.ui import settings as settings_ui
 from src.ui.common import apply_style
 
-st.set_page_config(page_title="주식대시보드YS", page_icon="◈", layout="wide")
+st.set_page_config(page_title="대시보드", page_icon="▦", layout="wide")
 apply_style()
 
 
@@ -22,9 +22,8 @@ def resources():
 
 config, db, news, market = resources()
 with st.sidebar:
-    st.markdown('<div class="brand-mark">YS<span>MARKET DESK</span></div>', unsafe_allow_html=True)
-    st.title("주식대시보드YS")
-    st.caption("뉴스와 수급, 나의 시선으로.")
+    st.markdown('<div class="sidebar-brand">대시보드</div>', unsafe_allow_html=True)
+    st.caption("시장 뉴스 · 수급 · 실시간")
     st.divider()
     page = st.radio(
         "워크스페이스",
@@ -42,7 +41,7 @@ if page != "장중 관심종목" and "live_session" in st.session_state:
     st.session_state.live_session.stop()
     del st.session_state.live_session
 
-st.caption(f"MY MARKET WORKSPACE  /  {now_kst():%Y.%m.%d}  /  KRX")
+st.caption(f"KRX MARKET  /  {now_kst():%Y.%m.%d}  /  ASIA/SEOUL")
 if page == "아침 브리핑":
     morning.render(db, news, market, config)
 elif page == "장중 관심종목":

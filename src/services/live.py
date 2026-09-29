@@ -25,7 +25,7 @@ class LiveSession:
         if self._thread and self._thread.is_alive():
             return
         self._status = "연결 중"
-        self._thread = threading.Thread(target=self._run, daemon=True, name="ys-live")
+        self._thread = threading.Thread(target=self._run, daemon=True, name="dashboard-live")
         self._thread.start()
 
     def touch(self):

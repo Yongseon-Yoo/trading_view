@@ -4,15 +4,15 @@ import streamlit as st
 
 from src.domain.models import ProviderError, now_kst
 from src.services.evening_flow import RANKINGS, build_evening
-from src.ui.common import BLUE, RED, chart_style, latest, statuses, title
+from src.ui.common import NEGATIVE, POSITIVE, chart_style, latest, statuses, title
 
 
 def render(db, market, config):
-    title("오늘, 거래가 모인 곳", "외국인과 기관의 매매를 시장별로 정리해 확인하세요.")
+    title("장 마감 수급", "외국인·기관의 순매수와 순매도를 시장별로 확인합니다.")
     if config.market_mode != "api":
         st.warning("키움 API 인증정보가 없습니다. .env 설정을 확인하세요.")
     col, action = st.columns([3, 1])
-    col.caption("CLOSING REPORT  /  순매수금액 · 거래대금 TOP 10")
+    col.caption("MARKET FLOW  /  순매수금액 · 거래대금 TOP 10")
     if action.button(
         "장 마감 수급 리포트 생성",
         type="primary",
@@ -48,7 +48,7 @@ def show(report):
                     st.info("표시할 업종 집계가 없습니다.")
                     continue
                 fig = go.Figure()
-                for side, name, color in (("buy", "순매수 +", RED), ("sell", "순매도 −", BLUE)):
+                for side, name, color in (("buy", "순매수 +", POSITIVE), ("sell", "순매도 −", NEGATIVE)):
                     subset = [g for g in groups if g["side"] == side]
                     fig.add_trace(
                         go.Bar(
@@ -63,12 +63,15 @@ def show(report):
                         )
                     )
                 fig.update_layout(barmode="relative")
-                st.plotly_chart(
-                    chart_style(fig, 320, "순매수금액 · 억원"),
-                    use_container_width=True,
-                    key=f"evening-sector-{market}-{investor}-{report['generated_at']}",
-                )
-                st.caption("전체 업종 수급이 아닌 순매수·순매도 Top 10 포함 종목 기준 · 매수/매도 각각 집계")
+                with st.container(border=True):
+                    st.plotly_chart(
+                        chart_style(fig, 320, "순매수금액 · 억원"),
+                        use_container_width=True,
+                        key=f"evening-sector-{market}-{investor}-{report['generated_at']}",
+                    )
+                    st.caption(
+                        "전체 업종 수급이 아닌 순매수·순매도 Top 10 포함 종목 기준 · 매수/매도 각각 집계"
+                    )
             st.subheader("종목별 원자료")
             rank = st.selectbox(
                 "순위 선택",

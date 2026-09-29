@@ -4,17 +4,17 @@ import streamlit as st
 
 from src.domain.models import now_kst
 from src.services.morning_brief import build_morning
-from src.ui.common import TEAL, chart_style, date_label, latest, statuses, title
+from src.ui.common import ACCENT, chart_style, date_label, latest, statuses, title
 
 
 def render(db, news, market, config):
-    title("하루의 시작, 시장의 단서", "관심 종목과 테마의 밤사이 소식. 의미와 판단은 직접 살펴보세요.")
+    title("아침 브리핑", "직전 장 마감 이후의 가격과 뉴스를 한눈에 확인합니다.")
     if config.news_mode != "api":
         st.warning("네이버 뉴스 API 인증정보가 없습니다. .env 설정을 확인하세요.")
     if config.market_mode != "api":
         st.info("키움 인증정보가 없어 가격 카드는 표시되지 않습니다.")
     col, action = st.columns([3, 1])
-    col.caption("MORNING BRIEF  /  직전 거래일 장 마감 이후")
+    col.caption("NEWS BRIEF  /  직전 거래일 장 마감 이후")
     if action.button(
         "아침 브리핑 생성",
         type="primary",
@@ -45,6 +45,8 @@ def show(report: dict):
     st.caption(
         f"{report['news_source']}  |  {date_label(report['window_start'])} → {date_label(report['window_end'])}"
     )
+    if report["quotes"]:
+        st.subheader("관심 종목 가격")
     for offset in range(0, len(report["quotes"]), 3):
         columns = st.columns(3)
         for col, q in zip(columns, report["quotes"][offset : offset + 3], strict=False):
@@ -55,6 +57,7 @@ def show(report: dict):
                     f"{q['code']} · {q['label']} · 기준일 {q['price_date']}\n\n조회 {date_label(q['fetched_at'])}"
                 )
     st.divider()
+    st.subheader("뉴스 동향")
     tabs = st.tabs(["관심 종목 뉴스", "관심 테마 뉴스"])
     for tab, kind in zip(tabs, ["종목", "테마"], strict=True):
         with tab:
@@ -90,30 +93,41 @@ def show_section(section: dict, key: str):
         go.Bar(
             x=frame["time"],
             y=frame["count"],
-            marker_color=TEAL,
+            marker_color=ACCENT,
             customdata=frame[["issues", "partial"]],
             hovertemplate="%{x}<br>기사 %{y}건<br>유사 기사 묶음 %{customdata[0]}개<extra></extra>",
         )
     )
-    st.plotly_chart(
-        chart_style(fig, 250, "발행 시각 · KST", "수집 기사 수"),
-        use_container_width=True,
-        key=key,
-    )
-    st.caption("동일 URL은 1건으로 계산 · 양 끝 시간대는 조회 범위 내 기사만 포함 · 유사 제목 묶음은 추정치")
+    with st.container(border=True):
+        st.plotly_chart(
+            chart_style(fig, 250, "발행 시각 · KST", "수집 기사 수"),
+            use_container_width=True,
+            key=key,
+        )
+        st.caption("동일 URL은 1건 · 양 끝 시간대는 조회 범위 내 기사만 포함 · 유사 제목 묶음은 추정치")
     if not section["groups"] and not section["failed"]:
         st.info("새로운 뉴스 없음")
-    for group in section["groups"]:
-        article = group[0]
-        with st.container(border=True):
-            st.write(article["title"])
-            st.caption(
-                f"{article['source']}  ·  {date_label(article['published_at'])}  ·  관련 기사 {len(group)}건"
-            )
-            st.link_button("원문 보기 ↗", article["url"])
-            if len(group) > 1:
-                with st.expander("묶인 기사 보기"):
-                    for item in group[1:]:
-                        st.write(item["title"])
-                        st.caption(f"{item['source']} · {date_label(item['published_at'])}")
-                        st.link_button("기사 열기 ↗", item["url"])
+    if section["groups"]:
+        st.subheader(f"기사 목록 · {len(section['groups'])}개 이슈")
+    for group in section["groups"][:8]:
+        show_article_group(group)
+    if len(section["groups"]) > 8:
+        with st.expander(f"나머지 {len(section['groups']) - 8}개 이슈 보기"):
+            for group in section["groups"][8:]:
+                show_article_group(group)
+
+
+def show_article_group(group: list[dict]) -> None:
+    article = group[0]
+    with st.container(border=True):
+        st.write(article["title"])
+        st.caption(
+            f"{article['source']}  ·  {date_label(article['published_at'])}  ·  관련 기사 {len(group)}건"
+        )
+        st.link_button("원문 보기 ↗", article["url"])
+        if len(group) > 1:
+            with st.expander("묶인 기사 보기"):
+                for item in group[1:]:
+                    st.write(item["title"])
+                    st.caption(f"{item['source']} · {date_label(item['published_at'])}")
+                    st.link_button("기사 열기 ↗", item["url"])

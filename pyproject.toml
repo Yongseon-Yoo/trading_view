@@ -1,5 +1,5 @@
 [project]
-name = "stock-dashboard-ys"
+name = "stock-dashboard"
 version = "0.1.0"
 description = "뉴스·수급·실시간 체결을 모아보는 로컬 주식 대시보드"
 requires-python = ">=3.11"
